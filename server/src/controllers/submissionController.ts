@@ -91,7 +91,7 @@ export const approveSubmission = async (req: Request, res: Response) => {
                 .json({ success: false, error: "Unauthorized access." });
         }
 
-        const { username, content, performanceScore, integrityLevel, status, modelUrl, imageUrl } =
+        const { username, wish, sentiment, status, modelUrl, imageUrl } =
             req.body;
 
         let uploadedImageUrl = imageUrl;
@@ -109,9 +109,8 @@ export const approveSubmission = async (req: Request, res: Response) => {
         const newSubmission = await Submission.create({
             userId: authReq.user.uid,
             username,
-            content,
-            performanceScore,
-            integrityLevel,
+            wish,
+            sentiment,
             status,
             modelUrl,
             imageUrl: uploadedImageUrl,

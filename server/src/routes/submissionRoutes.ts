@@ -12,17 +12,17 @@ import {
     proxyModel,
     proxyRawModel
 } from '../controllers/submissionController';
-import { authenticate } from '../middleware/auth';
+import { verifyAuthToken } from '../middleware/auth';
 
 const router = express.Router();
 
 // Student Endpoints
-router.post('/', authenticate, upload.single('image'), processSubmission);
-router.post('/generate', authenticate, generateReward);
-router.get('/status/:taskId', authenticate, checkRewardStatus);
-router.post('/approve', authenticate, approveSubmission);
-router.get('/wishes', authenticate, getSubmissions);
-router.get('/wishes/:id', authenticate, getSubmissionById);
+router.post('/', verifyAuthToken, upload.single('image'), processSubmission);
+router.post('/generate', verifyAuthToken, generateReward);
+router.get('/status/:taskId', verifyAuthToken, checkRewardStatus);
+router.post('/approve', verifyAuthToken, approveSubmission);
+router.get('/wishes', verifyAuthToken, getSubmissions);
+router.get('/wishes/:id', verifyAuthToken, getSubmissionById);
 
 // Educator Admin Endpoints
 router.get('/educator/submissions', getEducatorQueue);

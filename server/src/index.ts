@@ -37,3 +37,5 @@ setupSocket(io);
 httpServer.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+// Triggering nodemon restart after env updates
