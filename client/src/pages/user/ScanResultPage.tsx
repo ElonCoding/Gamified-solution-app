@@ -9,13 +9,12 @@ import {
     X,
     Loader2,
 } from "lucide-react";
-import Snowfall from "../../components/Snowfall";
 import { useState, useRef, useEffect } from "react";
 import HologramViewer from "../../components/HologramViewer";
 import {
-    generateToyTask,
+    generateRewardTask,
     checkTaskStatus,
-    approveWish,
+    approveReward,
 } from "../../services/scanService";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -123,7 +122,7 @@ const ScanResultPage = () => {
 
         try {
             const token = await currentUser.getIdToken();
-            const response = await generateToyTask(result.wish, token);
+            const response = await generateRewardTask(result.wish, token);
 
             if (response.success && response.taskId) {
                 setStatusMessage("Task Queued. Waking up fabricators...");
@@ -145,7 +144,7 @@ const ScanResultPage = () => {
         setIsApproving(true);
         try {
             const token = await currentUser.getIdToken();
-            await approveWish(
+            await approveReward(
                 {
                     username: result.personName,
                     wish: result.wish,
@@ -156,7 +155,7 @@ const ScanResultPage = () => {
                 },
                 token
             );
-            navigate("/wishes", { replace: true });
+            navigate("/submissions", { replace: true });
         } catch (error: any) {
             alert(
                 "Approval Failed: " +
@@ -184,7 +183,6 @@ const ScanResultPage = () => {
     return (
         <div className='min-h-screen bg-cyber-dark text-white relative overflow-hidden font-sans p-4 md:p-8'>
             <div className='absolute inset-0 bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-blue-900/20 via-black to-black opacity-40 pointer-events-none' />
-            <Snowfall />
 
             {/* Back Navigation */}
             <motion.button
@@ -206,7 +204,7 @@ const ScanResultPage = () => {
                             DECODING COMPLETE
                         </div>
                         <h1 className='text-3xl md:text-5xl font-bold mb-2 tracking-tight'>
-                            Wish Blueprint
+                            Submission Analysis
                         </h1>
                         <p className='text-gray-400 text-sm md:text-base'>
                             Please verify the decoded data before initiating the
@@ -232,7 +230,7 @@ const ScanResultPage = () => {
 
                             <div>
                                 <label className='block text-gray-500 text-xs font-mono tracking-widest mb-1'>
-                                    DETECTED WISH
+                                    DETECTED RESPONSE
                                 </label>
                                 <div className='text-3xl font-bold text-cyber-neon tracking-tight leading-none'>
                                     {result.wish}

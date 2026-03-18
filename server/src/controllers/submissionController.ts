@@ -13,10 +13,13 @@ export const upload = multer({
     limits: { fileSize: 5 * 1024 * 1024 },
 });
 
-export const processScan = async (req: Request, res: Response) => {
+/**
+ * Process a test submission scan via Gemini AI
+ */
+export const processSubmission = async (req: Request, res: Response) => {
     try {
         if (!req.file) {
-            return res.status(400).json({ error: "No image file provided." });
+            return res.status(400).json({ error: "No document provided for scanning." });
         }
 
         const aiResult = await analyzeImageForWishes(
@@ -31,32 +34,38 @@ export const processScan = async (req: Request, res: Response) => {
     } catch (error: any) {
         res.status(500).json({
             success: false,
-            error: error.message || "Internal Server Error during scanning.",
+            error: error.message || "Internal Server Error during AI analysis.",
         });
     }
 };
 
-export const generateToy = async (req: Request, res: Response) => {
+/**
+ * Trigger AI 3D Reward Generation
+ */
+export const generateReward = async (req: Request, res: Response) => {
     try {
-        const { wish } = req.body;
+        const { prompt } = req.body;
 
-        if (!wish) {
-            return res.status(400).json({ error: "No wish prompt provided." });
+        if (!prompt) {
+            return res.status(400).json({ error: "No reward description provided." });
         }
 
-        const taskId = await createTripoTask(wish);
+        const taskId = await createTripoTask(prompt);
 
         res.json({
             success: true,
             taskId: taskId,
-            message: "Fabrication initiated.",
+            message: "Reward fabrication initiated.",
         });
     } catch (error: any) {
         res.status(500).json({ success: false, error: error.message });
     }
 };
 
-export const checkToyStatus = async (req: Request, res: Response) => {
+/**
+ * Check status of 3D reward generation
+ */
+export const checkRewardStatus = async (req: Request, res: Response) => {
     try {
         const { taskId } = req.params;
         const result = await getTripoTask(taskId);
@@ -70,39 +79,41 @@ export const checkToyStatus = async (req: Request, res: Response) => {
     }
 };
 
-export const approveWish = async (req: Request, res: Response) => {
+/**
+ * Manually approve a submission and save its reward (Educator Action)
+ */
+export const approveSubmission = async (req: Request, res: Response) => {
     try {
         const authReq = req as AuthRequest;
         if (!authReq.user) {
             return res
                 .status(401)
-                .json({ success: false, error: "User not authenticated" });
+                .json({ success: false, error: "Unauthorized access." });
         }
 
-        const { username, wish, sentiment, status, modelUrl, imageUrl } =
+        const { username, content, performanceScore, integrityLevel, status, modelUrl, imageUrl } =
             req.body;
 
         let uploadedImageUrl = imageUrl;
         if (imageUrl && !imageUrl.includes("res.cloudinary.com")) {
             try {
                 const uploadRes = await cloudinary.uploader.upload(imageUrl, {
-                    folder: "claus_wishes",
+                    folder: "edu_submissions",
                 });
                 uploadedImageUrl = uploadRes.secure_url;
             } catch (err: any) {
-                console.error("Failed to upload image to Cloudinary", err);
+                console.error("Cloudinary sync failed", err);
             }
         }
-
-        const finalModelUrl = modelUrl;
 
         const newSubmission = await Submission.create({
             userId: authReq.user.uid,
             username,
-            wish,
-            sentiment,
+            content,
+            performanceScore,
+            integrityLevel,
             status,
-            modelUrl: finalModelUrl,
+            modelUrl,
             imageUrl: uploadedImageUrl,
         });
 
@@ -115,37 +126,16 @@ export const approveWish = async (req: Request, res: Response) => {
     }
 };
 
-export const proxyModel = async (req: Request, res: Response) => {
-    try {
-        const { id } = req.params;
-        const submission = await Submission.findById(id);
-
-        if (!submission || !submission.modelUrl) {
-            return res.status(404).send("Model not found");
-        }
-
-        const response = await axios.get(submission.modelUrl, {
-            responseType: "arraybuffer",
-        });
-
-        res.setHeader(
-            "Content-Type",
-            response.headers["content-type"] || "model/gltf-binary"
-        );
-        res.send(response.data);
-    } catch (error: any) {
-        console.error("Proxy error:", error.message);
-        res.status(500).send("Error retrieving model stream");
-    }
-};
-
+/**
+ * Get all submissions for the current student
+ */
 export const getSubmissions = async (req: Request, res: Response) => {
     try {
         const authReq = req as AuthRequest;
         if (!authReq.user) {
             return res
                 .status(401)
-                .json({ success: false, error: "User not authenticated" });
+                .json({ success: false, error: "Unauthorized access." });
         }
 
         const submissions = await Submission.find({
@@ -161,6 +151,9 @@ export const getSubmissions = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * Get single submission details
+ */
 export const getSubmissionById = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
@@ -169,7 +162,7 @@ export const getSubmissionById = async (req: Request, res: Response) => {
         if (!submission) {
             return res
                 .status(404)
-                .json({ success: false, error: "Submission not found" });
+                .json({ success: false, error: "Submission registry not found." });
         }
 
         res.json({
@@ -181,6 +174,9 @@ export const getSubmissionById = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * Educator Admin: Fetch pending verification queue
+ */
 export const getEducatorQueue = async (req: Request, res: Response) => {
     try {
         const submissions = await Submission.find({}).sort({ createdAt: -1 });
@@ -193,6 +189,9 @@ export const getEducatorQueue = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * Educator Admin: Update submission status
+ */
 export const updateSubmissionStatus = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
@@ -201,7 +200,7 @@ export const updateSubmissionStatus = async (req: Request, res: Response) => {
         if (!["pending", "approved", "denied"].includes(status)) {
             return res
                 .status(400)
-                .json({ success: false, error: "Invalid status" });
+                .json({ success: false, error: "Invalid status parameters." });
         }
 
         const updatedSubmission = await Submission.findByIdAndUpdate(
@@ -213,7 +212,7 @@ export const updateSubmissionStatus = async (req: Request, res: Response) => {
         if (!updatedSubmission) {
             return res
                 .status(404)
-                .json({ success: false, error: "Submission not found" });
+                .json({ success: false, error: "Submission reference not found." });
         }
 
         res.json({
@@ -225,6 +224,36 @@ export const updateSubmissionStatus = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * Proxy GLB model streams (Security & CORS handling)
+ */
+export const proxyModel = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const submission = await Submission.findById(id);
+
+        if (!submission || !submission.modelUrl) {
+            return res.status(404).send("Model asset not found.");
+        }
+
+        const response = await axios.get(submission.modelUrl, {
+            responseType: "arraybuffer",
+        });
+
+        res.setHeader(
+            "Content-Type",
+            response.headers["content-type"] || "model/gltf-binary"
+        );
+        res.send(response.data);
+    } catch (error: any) {
+        console.error("Proxy error:", error.message);
+        res.status(500).send("Error streaming model asset.");
+    }
+};
+
+/**
+ * Proxy raw Tripo URLs
+ */
 export const proxyRawModel = async (req: Request, res: Response) => {
     try {
         const { url } = req.query;
@@ -234,14 +263,10 @@ export const proxyRawModel = async (req: Request, res: Response) => {
         }
 
         const allowedDomains = ['tripo3d.com', 'tripo-data.rg1.data.tripo3d.com'];
-        if (url.includes('localhost') || url.includes('127.0.0.1')) {
-            return res.status(403).send("Localhost access denied");
-        }
-
         try {
             const parsedUrl = new URL(url);
             const isAllowed = allowedDomains.some(d => parsedUrl.hostname === d || parsedUrl.hostname.endsWith('.' + d));
-            if (!isAllowed) return res.status(403).send("Domain not allowed");
+            if (!isAllowed) return res.status(403).send("Domain proxy restricted.");
         } catch (e) {
             return res.status(400).send("Invalid URL");
         }
@@ -257,6 +282,6 @@ export const proxyRawModel = async (req: Request, res: Response) => {
         res.send(response.data);
     } catch (error: any) {
         console.error("Raw Proxy error:", error.message);
-        res.status(500).send("Error proxying model");
+        res.status(500).send("Error proxying asset store.");
     }
 };

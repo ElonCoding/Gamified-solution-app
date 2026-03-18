@@ -1,66 +1,103 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import UserHome from './pages/user/UserHome';
-import ScannerPage from './pages/user/ScannerPage';
-import ScanResultPage from './pages/user/ScanResultPage';
-import ProtectedRoute from './components/ProtectedRoute';
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+import { SocketProvider } from "./contexts/SocketContext";
+import PrivateRoute from "./components/PrivateRoute";
+import EducatorRoute from "./components/EducatorRoute";
 
-import ApprovedWishesPage from './pages/user/ApprovedWishesPage';
-import SingleWishPage from './pages/user/SingleWishPage';
+// Student Pages
+import StudentDashboard from "./pages/user/StudentDashboard";
+import SecureTestEnvironment from "./pages/user/SecureTestEnvironment";
+import RewardGenerationPage from "./pages/user/RewardGenerationPage";
+import TrophyRoom from "./pages/user/TrophyRoom";
+import ARPlayground from "./pages/user/ARPlayground";
 
-import SantaLoginPage from './pages/santa/SantaLoginPage';
-import SantaDashboard from './pages/santa/SantaDashboard';
-import SantaQueuePage from './pages/santa/SantaQueuePage';
-import SantaCommsPage from './pages/santa/SantaCommsPage';
-import SantaRoute from './components/SantaRoute';
+// Educator Pages
+import EducatorLoginPage from "./pages/educator/EducatorLoginPage";
+import EducatorDashboard from "./pages/educator/EducatorDashboard";
+import MonitoringQueuePage from "./pages/educator/MonitoringQueuePage";
+import EducatorChatPage from "./pages/educator/EducatorChatPage";
+
+// Shared Components
+import TeacherChatWidget from "./components/TeacherChatWidget";
 
 function App() {
-	return (
-		<Router>
-			<Routes>
-				{/* User Routes */}
-				<Route path="/" element={<UserHome />} />
-				<Route path="/scanner" element={
-					<ProtectedRoute>
-						<ScannerPage />
-					</ProtectedRoute>
-				} />
-				<Route path="/result" element={
-					<ProtectedRoute>
-						<ScanResultPage />
-					</ProtectedRoute>
-				} />
-				<Route path="/wishes" element={
-					<ProtectedRoute>
-						<ApprovedWishesPage />
-					</ProtectedRoute>
-				} />
-				<Route path="/wishes/:id" element={
-					<ProtectedRoute>
-						<SingleWishPage />
-					</ProtectedRoute>
-				} />
+    return (
+        <AuthProvider>
+            <SocketProvider>
+                <Router>
+                    <div className='min-h-screen bg-edu-dark'>
+                        <Routes>
+                            {/* Student Routes */}
+                            <Route path='/' element={<StudentDashboard />} />
+                            <Route
+                                path='/scanner'
+                                element={
+                                    <PrivateRoute>
+                                        <SecureTestEnvironment />
+                                    </PrivateRoute>
+                                }
+                            />
+                            <Route
+                                path='/scan-result'
+                                element={
+                                    <PrivateRoute>
+                                        <RewardGenerationPage />
+                                    </PrivateRoute>
+                                }
+                            />
+                            <Route
+                                path='/submissions'
+                                element={
+                                    <PrivateRoute>
+                                        <TrophyRoom />
+                                    </PrivateRoute>
+                                }
+                            />
+                            <Route
+                                path='/submissions/:id'
+                                element={
+                                    <PrivateRoute>
+                                        <ARPlayground />
+                                    </PrivateRoute>
+                                }
+                            />
 
+                            {/* Educator Routes */}
+                            <Route path='/educator/login' element={<EducatorLoginPage />} />
+                            <Route
+                                path='/educator/dashboard'
+                                element={
+                                    <EducatorRoute>
+                                        <EducatorDashboard />
+                                    </EducatorRoute>
+                                }
+                            />
+                            <Route
+                                path='/educator/queue'
+                                element={
+                                    <EducatorRoute>
+                                        <MonitoringQueuePage />
+                                    </EducatorRoute>
+                                }
+                            />
+                            <Route
+                                path='/educator/comms'
+                                element={
+                                    <EducatorRoute>
+                                        <EducatorChatPage />
+                                    </EducatorRoute>
+                                }
+                            />
 
-				{/* Santa Admin Routes */}
-				<Route path="/santa/login" element={<SantaLoginPage />} />
-				<Route path="/santa/dashboard" element={
-					<SantaRoute>
-						<SantaDashboard />
-					</SantaRoute>
-				} />
-				<Route path="/santa/queue" element={
-					<SantaRoute>
-						<SantaQueuePage />
-					</SantaRoute>
-				} />
-				<Route path="/santa/comms" element={
-					<SantaRoute>
-						<SantaCommsPage />
-					</SantaRoute>
-				} />
-			</Routes>
-		</Router>
-	)
+                            {/* Fallback */}
+                            <Route path='*' element={<Navigate to='/' replace />} />
+                        </Routes>
+                        <TeacherChatWidget />
+                    </div>
+                </Router>
+            </SocketProvider>
+        </AuthProvider>
+    );
 }
 
 export default App;

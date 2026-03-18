@@ -2,15 +2,48 @@
 @import "tailwindcss";
 
 @theme {
-  --color-cyber-neon: #0ff;
-  --color-cyber-dark: #0a0a12;
-  --color-cyber-glass: rgba(255, 255, 255, 0.1);
+  --color-edu-primary: #6366f1; /* Indigo */
+  --color-edu-secondary: #0ea5e9; /* Sky Blue */
+  --color-edu-accent: #f59e0b; /* Amber/Gold */
+  --color-edu-dark: #020617; /* Slate 950 */
+  --color-edu-surface: rgba(15, 23, 42, 0.8); /* Slate 900 with transparency */
   --font-mono: "Share Tech Mono", monospace;
   --font-sans: "Orbitron", sans-serif;
 }
 
 @layer base {
-  body {
-    @apply bg-cyber-dark text-white font-sans overflow-x-hidden;
+  * {
+    @apply border-white/5;
   }
+  body {
+    @apply bg-edu-dark text-white font-sans overflow-x-hidden selection:bg-edu-primary/30;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl shadow-2xl;
+  }
+  .glass-button {
+    @apply bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all rounded-xl;
+  }
+}
+
+/* Animations */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.glow-primary {
+  box-shadow: 0 0 40px -10px rgba(99, 102, 241, 0.4);
+}
+
+.text-glow {
+  text-shadow: 0 0 15px rgba(99, 102, 241, 0.7);
 }

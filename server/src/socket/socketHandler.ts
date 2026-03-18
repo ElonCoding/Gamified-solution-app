@@ -14,8 +14,8 @@ export const setupSocket = (io: Server) => {
             io.emit("admin_receive_message", data);
 
             try {
-                const isSanta = data.senderId === 'santa' || data.senderName === 'Santa Claus';
-                const senderRole = isSanta ? 'santa' : 'user';
+                const isEducator = data.senderId === 'educator' || data.senderRole === 'educator';
+                const senderRole = isEducator ? 'educator' : 'user';
 
                 const conversationOwnerId = data.room;
 

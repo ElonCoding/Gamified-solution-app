@@ -5,7 +5,7 @@ import express from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import scanRoutes from "./routes/scanRoutes";
+import submissionRoutes from "./routes/submissionRoutes";
 import chatRoutes from "./routes/chatRoutes";
 import connectDB from './config/db';
 import { setupSocket } from './socket/socketHandler';
@@ -28,7 +28,7 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use("/api/v1/scan", scanRoutes);
+app.use("/api/v1/scan", submissionRoutes);
 app.use("/api/v1/chat", chatRoutes);
 
 // Socket io

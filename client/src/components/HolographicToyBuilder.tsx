@@ -1,5 +1,4 @@
-import { motion } from "framer-motion";
-import { Gift } from "lucide-react";
+import { Trophy } from "lucide-react";
 
 const HolographicToyBuilder = () => {
     return (
@@ -60,13 +59,13 @@ const HolographicToyBuilder = () => {
                             }}
                         />
 
-                        {/* Inner Gift representing the "Toy" */}
+                        {/* Inner Trophy representing the "Reward" */}
                         <div
                             className='absolute inset-0 flex items-center justify-center'
                             style={{ transform: "rotateY(-360deg)" }}>
                             {" "}
                             {/* Counter rotation to keep icon facing forward */}
-                            <Gift className='w-16 h-16 text-red-500 drop-shadow-[0_0_15px_rgba(255,0,0,0.8)]' />
+                            <Trophy className='w-16 h-16 text-edu-secondary drop-shadow-[0_0_15px_rgba(251,182,14,0.8)]' />
                         </div>
                     </motion.div>
 

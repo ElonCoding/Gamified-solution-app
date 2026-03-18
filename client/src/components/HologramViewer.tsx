@@ -4,7 +4,8 @@ import { useGLTF, Stage, OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 
 function Model({ url, onLoaded }: { url: string; onLoaded?: () => void }) {
-    const { scene } = useGLTF(url);
+    // Handling potential missing URL for the initial load
+    const { scene } = useGLTF(url || '/models/trophy.glb'); 
     const ref = useRef<THREE.Group>(null);
 
     useEffect(() => {
@@ -29,32 +30,43 @@ interface HologramViewerProps {
 
 const HologramViewer = ({ modelUrl, onLoaded }: HologramViewerProps) => {
     return (
-        <div className="w-full h-full min-h-100 relative rounded-2xl overflow-hidden border border-cyber-neon/30 bg-black/40">
-            <div className="absolute inset-0 z-10 bg-[linear-gradient(rgba(0,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,255,0.03)_1px,transparent_1px)] bg-size-[40px_40px] pointer-events-none" />
-            <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-cyber-neon z-20" />
-            <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-cyber-neon z-20" />
-            <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-cyber-neon z-20" />
-            <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-cyber-neon z-20" />
+        <div className="w-full h-full min-h-100 relative rounded-[40px] overflow-hidden border border-white/10 bg-edu-surface/30 backdrop-blur-3xl shadow-2xl">
+            {/* Grid floor / Tech overlay */}
+            <div className="absolute inset-0 z-10 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-size-[60px_60px] pointer-events-none" />
+            
+            {/* Corner Bracket Accents */}
+            <div className="absolute top-8 left-8 w-10 h-10 border-t-2 border-l-2 border-edu-primary/30 z-20 rounded-tl-xl" />
+            <div className="absolute top-8 right-8 w-10 h-10 border-t-2 border-r-2 border-edu-primary/30 z-20 rounded-tr-xl" />
+            <div className="absolute bottom-8 left-8 w-10 h-10 border-b-2 border-l-2 border-edu-primary/30 z-20 rounded-bl-xl" />
+            <div className="absolute bottom-8 right-8 w-10 h-10 border-b-2 border-r-2 border-edu-primary/30 z-20 rounded-br-xl" />
 
             {modelUrl ? (
                 <Canvas shadows dpr={[1, 2]} camera={{ position: [2, 2, 4], fov: 45 }}>
-                    <color attach="background" args={['#050510']} />
+                    <color attach="background" args={['#0a0a0f']} />
 
                     <ambientLight intensity={1.5} />
                     <directionalLight position={[5, 5, 5]} intensity={2} castShadow />
                     <directionalLight position={[-5, 5, -5]} intensity={1} />
 
                     <Suspense fallback={null}>
-                        <Stage intensity={0.5} environment="city">
+                        <Stage intensity={0.5} environment="city" adjustCamera={1.5}>
                             <Model url={modelUrl} onLoaded={onLoaded} />
                         </Stage>
                     </Suspense>
 
-                    <OrbitControls makeDefault autoRotate autoRotateSpeed={2} minPolarAngle={0} maxPolarAngle={Math.PI} />
+                    <OrbitControls 
+                        makeDefault 
+                        autoRotate 
+                        autoRotateSpeed={1} 
+                        enableZoom={false}
+                        minPolarAngle={Math.PI / 4} 
+                        maxPolarAngle={Math.PI / 2} 
+                    />
                 </Canvas>
             ) : (
-                <div className="absolute inset-0 flex items-center justify-center text-cyber-neon/50 font-mono tracking-widest z-0">
-                    WAITING FOR INPUT STREAM...
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-edu-primary/40 font-mono tracking-widest z-0">
+                    <div className="w-12 h-12 border-2 border-edu-primary/20 border-t-edu-primary/60 rounded-full animate-spin" />
+                    <div className="text-[10px] uppercase font-bold">Initializing Holographic Projection...</div>
                 </div>
             )}
         </div>

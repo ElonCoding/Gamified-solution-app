@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const wishSchema = new mongoose.Schema({
+const submissionSchema = new mongoose.Schema({
     username: {
         type: String,
         required: true
@@ -35,5 +35,5 @@ const wishSchema = new mongoose.Schema({
     }
 });
 
-const Wish = mongoose.model('Wish', wishSchema);
-export default Wish;
+const Submission = mongoose.model('Submission', submissionSchema);
+export default Submission;

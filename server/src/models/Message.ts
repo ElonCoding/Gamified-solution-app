@@ -16,7 +16,7 @@ const messageSchema = new mongoose.Schema({
     },
     sender: {
         type: String,
-        enum: ['user', 'santa', 'system'],
+        enum: ['user', 'educator', 'system'],
         required: true
     },
     timestamp: {

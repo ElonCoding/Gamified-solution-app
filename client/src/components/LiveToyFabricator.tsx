@@ -52,16 +52,16 @@ const LiveToyFabricator = ({ itemName, onComplete }: FabricatorProps) => {
             setIsTired(true);
             setGameState("PLAYING");
             videoRef.current.pause();
-            setLogs((l) => [`[ALERT] ELF WORKER NEEDS A BREAK!`, ...l]);
+            setLogs((l) => [`[ALERT] FABRICATION MODULE OVERHEATING!`, ...l]);
         }
 
         if (Math.random() > 0.95 && !isTired) {
             const possibleLogs = [
                 "Optimizing polygon mesh...",
-                "Tightening bolts...",
-                "Applying festive paint...",
+                "Tightening structural nodes...",
+                "Applying professional finish...",
                 "Checking durability...",
-                "Infusing holiday spirit...",
+                "Finalizing integrity protocols...",
             ];
             const randomLog =
                 possibleLogs[Math.floor(Math.random() * possibleLogs.length)];
@@ -110,7 +110,7 @@ const LiveToyFabricator = ({ itemName, onComplete }: FabricatorProps) => {
                 setTimeout(() => {
                     setIsTired(false);
                     setLogs((l) => [
-                        `[SYSTEM] ENERGY RESTORED! RESUMING...`,
+                        `[SYSTEM] PERFORMANCE RESTORED! RESUMING...`,
                         ...l,
                     ]);
                     if (videoRef.current) {
@@ -169,7 +169,7 @@ const LiveToyFabricator = ({ itemName, onComplete }: FabricatorProps) => {
                                 className='absolute inset-0 bg-black/80 backdrop-blur-md flex flex-col items-center justify-center z-50 p-4 text-center'>
                                 {gameState === "WON" ? (
                                     <div className='text-green-400 font-bold text-lg md:text-xl animate-bounce'>
-                                        ENERGY RESTORED!
+                                        INTEGRITY RESTORED!
                                     </div>
                                 ) : (
                                     <>
@@ -182,7 +182,7 @@ const LiveToyFabricator = ({ itemName, onComplete }: FabricatorProps) => {
                                                 SYSTEM ALERT
                                             </div>
                                             <div className='text-white font-medium text-xs md:text-base text-center'>
-                                                Worker Energy Depleted!
+                                                Fabrication Unit Overheating!
                                             </div>
                                         </div>
 
@@ -246,7 +246,7 @@ const LiveToyFabricator = ({ itemName, onComplete }: FabricatorProps) => {
                             <span>
                                 STATUS:{" "}
                                 {isTired
-                                    ? "PAUSED // WORKER IDLE"
+                                    ? "PAUSED // MODULE COOLING"
                                     : "ACTIVE // FABRICATING"}
                             </span>
                             <span>{Math.round(progress)}%</span>
