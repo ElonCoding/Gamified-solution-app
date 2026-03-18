@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { SocketProvider } from "./contexts/SocketContext";
-import PrivateRoute from "./components/PrivateRoute";
+import ProtectedRoute from "./components/ProtectedRoute";
 import EducatorRoute from "./components/EducatorRoute";
 
 // Student Pages
@@ -32,33 +32,33 @@ function App() {
                             <Route
                                 path='/scanner'
                                 element={
-                                    <PrivateRoute>
+                                    <ProtectedRoute>
                                         <SecureTestEnvironment />
-                                    </PrivateRoute>
+                                    </ProtectedRoute>
                                 }
                             />
                             <Route
                                 path='/scan-result'
                                 element={
-                                    <PrivateRoute>
+                                    <ProtectedRoute>
                                         <RewardGenerationPage />
-                                    </PrivateRoute>
+                                    </ProtectedRoute>
                                 }
                             />
                             <Route
                                 path='/submissions'
                                 element={
-                                    <PrivateRoute>
+                                    <ProtectedRoute>
                                         <TrophyRoom />
-                                    </PrivateRoute>
+                                    </ProtectedRoute>
                                 }
                             />
                             <Route
                                 path='/submissions/:id'
                                 element={
-                                    <PrivateRoute>
+                                    <ProtectedRoute>
                                         <ARPlayground />
-                                    </PrivateRoute>
+                                    </ProtectedRoute>
                                 }
                             />
 

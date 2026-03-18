@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import { getRewardById } from "../../services/scanService";
+import { getSubmissionById } from "../../services/scanService";
 import { motion } from "framer-motion";
 import {
     ArrowLeft,
@@ -38,7 +38,7 @@ const ARPlayground = () => {
             if (currentUser && id) {
                 try {
                     const token = await currentUser.getIdToken();
-                    const response = await getRewardById(id, token);
+                    const response = await getSubmissionById(id, token);
                     if (response.success) {
                         setReward(response.data);
                     }
@@ -172,7 +172,7 @@ const ARPlayground = () => {
                                 </div>
                             </div>
                         </motion.div>
-                    </div>
+
 
                         <div className="space-y-6">
                             <div className="bg-edu-surface p-8 rounded-3xl border border-white/5 backdrop-blur-xl relative">
