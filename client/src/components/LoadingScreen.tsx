@@ -6,7 +6,7 @@ interface LoadingScreenProps {
 
 const LoadingScreen = ({ message = "INITIALIZING SYSTEM..." }: LoadingScreenProps) => {
     return (
-        <div className="fixed inset-0 z-50 bg-cyber-dark/90 backdrop-blur-md flex flex-col items-center justify-center">
+        <div className="fixed inset-0 z-50 bg-edu-dark/90 backdrop-blur-md flex flex-col items-center justify-center">
             {/* Spinning Core */}
             <div className="relative w-24 h-24 mb-8">
                 <motion.div

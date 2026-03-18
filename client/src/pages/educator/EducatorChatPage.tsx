@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Send, User, ChevronLeft, Globe, MessageSquare, ShieldCheck, Search, Users } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useSocket } from "../../contexts/SocketContext";
 import { chatService } from "../../services/chatService";
@@ -178,27 +179,27 @@ const EducatorChatPage = () => {
         <div className="min-h-screen bg-edu-dark text-white font-sans relative overflow-hidden flex flex-col">
             <div className="absolute top-0 left-0 w-[50%] h-[50%] bg-edu-secondary/5 blur-[120px] rounded-full pointer-events-none" />
 
-            <header className="relative z-30 border-b border-white/5 bg-edu-surface/50 backdrop-blur-xl p-4 md:p-6 flex justify-between items-center">
+            <header className="relative z-30 border-b border-white/5 bg-edu-surface/40 backdrop-blur-2xl p-4 md:p-6 flex justify-between items-center shadow-[0_0_50px_-10px_rgba(99,102,241,0.2)]">
                 <div className="flex items-center gap-6">
                     <button
                         onClick={() => navigate("/educator/dashboard")}
-                        className="w-10 h-10 bg-white/5 hover:bg-white/10 rounded-xl flex items-center justify-center border border-white/5 transition-all"
+                        className="w-10 h-10 glass-button flex items-center justify-center"
                     >
                         <ChevronLeft size={20} />
                     </button>
                     <div>
-                        <h1 className="text-xl md:text-2xl font-black tracking-tight flex items-center gap-3">
+                        <h1 className="text-xl md:text-2xl font-black tracking-tighter flex items-center gap-3 text-glow">
                             <MessageSquare className="text-edu-secondary" size={24} />
                             COMMUNICATION HUB
                         </h1>
                         <div className="flex items-center gap-2 text-[10px] font-mono text-gray-500 uppercase tracking-widest mt-1">
-                            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_#22c55e]" />
                             Academic Support Channel Active
                         </div>
                     </div>
                 </div>
                 <div className="hidden md:flex items-center gap-3">
-                    <div className="bg-edu-secondary/10 border border-edu-secondary/20 px-4 py-1.5 rounded-full text-edu-secondary text-[10px] font-bold tracking-widest uppercase">
+                    <div className="bg-edu-secondary/10 border border-edu-secondary/20 px-4 py-1.5 rounded-full text-edu-secondary text-[10px] font-bold tracking-widest uppercase animate-pulse-glow">
                         Operator: Educator Panel
                     </div>
                 </div>
@@ -293,23 +294,25 @@ const EducatorChatPage = () => {
                             </div>
 
                             {/* Messages */}
-                            <div className="flex-1 overflow-y-auto p-8 space-y-6 custom-scrollbar">
+                            <div className="flex-1 overflow-y-auto p-8 space-y-6 custom-scrollbar bg-[radial-gradient(circle_at_50%_50%,rgba(99,102,241,0.03),transparent)]">
                                 {(messages[selectedUser.userId] || []).map((msg, idx) => (
-                                    <div
+                                    <motion.div
                                         key={idx}
+                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
                                         className={`flex flex-col ${msg.sender === "educator" ? "items-end" : "items-start"}`}
                                     >
-                                        <div className={`max-w-[80%] md:max-w-[60%] px-6 py-4 rounded-3xl text-sm leading-relaxed shadow-xl ${
+                                        <div className={`max-w-[80%] md:max-w-[60%] px-6 py-4 rounded-3xl text-sm leading-relaxed shadow-xl transition-all hover:scale-[1.02] ${
                                             msg.sender === "educator"
-                                                ? "bg-edu-primary text-white rounded-tr-none"
-                                                : "bg-edu-surface text-gray-200 border border-white/5 rounded-tl-none"
+                                                ? "bg-linear-to-br from-edu-primary to-edu-secondary text-white rounded-tr-none shadow-edu-primary/20"
+                                                : "glass-card-heavy text-gray-200 rounded-tl-none"
                                         }`}>
                                             {msg.text}
                                         </div>
-                                        <span className="text-[9px] text-gray-700 mt-2 font-mono uppercase px-2 font-bold tracking-widest">
+                                        <span className="text-[9px] text-gray-600 mt-2 font-mono uppercase px-2 font-bold tracking-widest">
                                             {msg.sender.toUpperCase()} • {msg.time}
                                         </span>
-                                    </div>
+                                    </motion.div>
                                 ))}
                                 <div ref={chatEndRef} />
                             </div>

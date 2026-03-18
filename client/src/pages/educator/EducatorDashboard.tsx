@@ -145,7 +145,7 @@ const EducatorDashboard = () => {
                         <div className="lg:col-span-2 space-y-6">
                             <div className="bg-edu-surface border border-white/5 rounded-3xl p-8">
                                 <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-                                    <Activity className="text-edu-secondary" size={20} />
+                                    <ActivityIcon className="text-edu-secondary" size={20} />
                                     Recent Activity
                                 </h3>
                                 <div className="space-y-4">
@@ -331,7 +331,7 @@ const EducatorDashboard = () => {
     );
 };
 
-const Activity = ({ className, size }: { className?: string, size?: number }) => (
+const ActivityIcon = ({ className, size }: { className?: string, size?: number }) => (
     <svg 
         xmlns="http://www.w3.org/2000/svg" 
         width={size} 

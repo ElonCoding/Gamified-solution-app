@@ -215,27 +215,38 @@ const StudentDashboard = () => {
                             </div>
                         </div>
 
-                        <div className="grid gap-4">
+                        <motion.div 
+                            initial="hidden"
+                            animate="visible"
+                            variants={{
+                                visible: { transition: { staggerChildren: 0.1 } }
+                            }}
+                            className="grid gap-4"
+                        >
                             {tests.map(test => (
                                 <motion.div 
                                     key={test.id}
-                                    whileHover={{ x: 10 }}
-                                    className={`bg-edu-surface rounded-2xl p-6 border border-white/5 backdrop-blur-xl flex items-center justify-between group cursor-pointer transition-all hover:bg-white/5
+                                    variants={{
+                                        hidden: { opacity: 0, x: -20 },
+                                        visible: { opacity: 1, x: 0 }
+                                    }}
+                                    whileHover={{ x: 10, backgroundColor: "rgba(255,255,255,0.05)" }}
+                                    className={`glass-card p-6 flex items-center justify-between group cursor-pointer transition-all
                                         ${test.status === 'Locked' ? 'opacity-60 grayscale cursor-not-allowed' : ''}`}
                                     onClick={() => test.status === 'Available' && navigate("/scanner")}
                                 >
                                     <div className="flex items-center gap-6">
-                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center
+                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110
                                             ${test.status === 'Completed' ? 'bg-green-500/10 text-green-500' : 
                                               test.status === 'Locked' ? 'bg-gray-500/10 text-gray-500' : 'bg-edu-primary/10 text-edu-primary'}`}>
-                                            {test.status === 'Completed' ? <Zap size={24} /> : 
-                                             test.status === 'Locked' ? <Lock size={24} /> : <BookOpen size={24} />}
+                                            {test.status === 'Completed' ? <Zap size={24} className="shadow-[0_0_10px_rgba(34,197,94,0.3)]" /> : 
+                                             test.status === 'Locked' ? <Lock size={24} /> : <BookOpen size={24} className="group-hover:animate-pulse" />}
                                         </div>
                                         <div>
-                                            <h4 className="font-bold text-lg group-hover:text-edu-primary transition-colors">{test.title}</h4>
+                                            <h4 className="font-bold text-lg group-hover:text-edu-secondary transition-colors tracking-tight">{test.title}</h4>
                                             <div className="flex items-center gap-4 mt-1">
-                                                <span className="text-xs text-gray-500 flex items-center gap-1 font-mono uppercase"><Play size={10} /> {test.duration}</span>
-                                                <span className="text-xs text-edu-accent flex items-center gap-1 font-mono uppercase"><Trophy size={10} /> {test.reward}</span>
+                                                <span className="text-[10px] text-gray-500 flex items-center gap-1 font-mono uppercase tracking-widest"><Play size={10} /> {test.duration}</span>
+                                                <span className="text-[10px] text-edu-accent flex items-center gap-1 font-mono uppercase tracking-widest font-bold"><Trophy size={10} /> {test.reward}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -255,7 +266,7 @@ const StudentDashboard = () => {
                                     </div>
                                 </motion.div>
                             ))}
-                        </div>
+                        </motion.div>
                     </div>
                 </div>
             </div>

@@ -1,4 +1,5 @@
 import { Trophy } from "lucide-react";
+import { motion } from "framer-motion";
 
 const HolographicToyBuilder = () => {
     return (

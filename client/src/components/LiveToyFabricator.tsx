@@ -124,17 +124,17 @@ const LiveToyFabricator = ({ itemName, onComplete }: FabricatorProps) => {
     };
 
     return (
-        <div className='relative w-full aspect-square bg-black/80 backdrop-blur-xl border border-cyber-neon/30 rounded-3xl overflow-hidden flex flex-col font-mono shadow-[0_0_50px_rgba(0,255,255,0.05)] select-none'>
+        <div className='relative w-full aspect-square glass-card-heavy border-cyber-neon/30 overflow-hidden flex flex-col font-mono shadow-[0_0_50px_rgba(0,255,255,0.05)] select-none group/fabricator'>
             {/* Header */}
             <div className='p-3 md:p-4 border-b border-white/10 flex items-center justify-between bg-black/40 relative z-20'>
                 <div className='flex items-center gap-2 text-cyber-neon'>
-                    <Activity className='w-4 h-4 animate-pulse' />
-                    <span className='text-[10px] md:text-xs font-bold tracking-widest'>
-                        LIVE FEED
+                    <Activity className='w-4 h-4 animate-pulse-glow shadow-[0_0_10px_#00f2ff]' />
+                    <span className='text-[10px] md:text-xs font-black tracking-[0.3em] text-glow-cyber'>
+                        QUANTUM FABRICATION FEED
                     </span>
                 </div>
-                <div className='text-[10px] md:text-[10px] text-gray-500 tracking-wider'>
-                    CAM_04
+                <div className='text-[10px] md:text-[10px] text-gray-500 font-mono tracking-widest opacity-50 uppercase'>
+                    Node: CAM_04 // System: Active
                 </div>
             </div>
 
@@ -148,7 +148,7 @@ const LiveToyFabricator = ({ itemName, onComplete }: FabricatorProps) => {
                         playsInline
                         onTimeUpdate={handleTimeUpdate}
                         onEnded={handleVideoEnded}>
-                        <source src='/vedio/Elf_Builds.mp4' type='video/mp4' />
+                        <source src='/video/Elf_Builds.mp4' type='video/mp4' />
 
                         {/* Fallback Simulation if video fails to load*/}
                         <div className='flex items-center justify-center h-full text-red-500'>

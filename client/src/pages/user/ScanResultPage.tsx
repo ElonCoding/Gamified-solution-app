@@ -232,7 +232,7 @@ const ScanResultPage = () => {
                                 <label className='block text-gray-500 text-xs font-mono tracking-widest mb-1'>
                                     DETECTED RESPONSE
                                 </label>
-                                <div className='text-3xl font-bold text-cyber-neon tracking-tight leading-none'>
+                                <div className='text-3xl font-black text-cyber-neon tracking-tighter leading-none text-glow-cyber'>
                                     {result.wish}
                                 </div>
                             </div>

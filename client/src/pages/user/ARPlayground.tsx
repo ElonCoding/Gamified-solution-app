@@ -148,24 +148,31 @@ const ARPlayground = () => {
 
                     {/* Right: Reward Metadata */}
                     <div className="lg:col-span-5 space-y-10">
-                        <div>
-                            <div className="text-edu-accent font-mono text-xs tracking-[0.3em] uppercase mb-4 font-bold flex items-center gap-2">
-                                <Trophy size={14} /> Earned Achievement
+                        <motion.div
+                            initial={{ x: 20, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                        >
+                            <div className="text-edu-secondary font-mono text-[10px] tracking-[0.4em] uppercase mb-4 font-black flex items-center gap-3">
+                                <Trophy size={14} className="animate-pulse-glow" /> 
+                                <span className="text-glow">Level 5 Achievement Unlocked</span>
                             </div>
-                            <h2 className="text-5xl md:text-6xl font-black mb-6 tracking-tight leading-none bg-linear-to-br from-white to-gray-500 bg-clip-text text-transparent">
+                            <h2 className="text-5xl md:text-7xl font-black mb-6 tracking-tighter leading-[0.9] text-white text-glow">
                                 {reward.wish}
                             </h2>
                             <div className="flex flex-wrap gap-4">
-                                <div className="bg-white/5 border border-white/10 px-4 py-2 rounded-full flex items-center gap-2 text-xs font-mono">
-                                    <Calendar size={14} className="text-edu-secondary" />
-                                    {new Date(reward.createdAt).toLocaleDateString()}
+                                <div className="glass-card px-5 py-2.5 flex items-center gap-3 text-xs font-mono border-white/5 hover:border-edu-primary/30 transition-colors group/meta">
+                                    <Calendar size={14} className="text-edu-secondary group-hover:scale-110 transition-transform" />
+                                    <span className="text-gray-400">SYNCED:</span>
+                                    <span className="text-white font-bold">{new Date(reward.createdAt).toLocaleDateString()}</span>
                                 </div>
-                                <div className="bg-white/5 border border-white/10 px-4 py-2 rounded-full flex items-center gap-2 text-xs font-mono">
-                                    <Clock size={14} className="text-edu-secondary" />
-                                    {new Date(reward.createdAt).toLocaleTimeString()}
+                                <div className="glass-card px-5 py-2.5 flex items-center gap-3 text-xs font-mono border-white/5 hover:border-edu-accent/30 transition-colors group/meta">
+                                    <ShieldCheck size={14} className="text-edu-accent group-hover:scale-110 transition-transform" />
+                                    <span className="text-gray-400">HASH:</span>
+                                    <span className="text-white font-bold">{reward._id.slice(0, 8).toUpperCase()}</span>
                                 </div>
                             </div>
-                        </div>
+                        </motion.div>
+                    </div>
 
                         <div className="space-y-6">
                             <div className="bg-edu-surface p-8 rounded-3xl border border-white/5 backdrop-blur-xl relative">
