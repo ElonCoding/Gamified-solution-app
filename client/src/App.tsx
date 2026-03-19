@@ -8,15 +8,19 @@ import LeaderboardPage from "./pages/LeaderboardPage";
 import ProfilePage from "./pages/ProfilePage";
 import AnalyticsPage from "./pages/AnalyticsPage";
 import AssistantPage from "./pages/AssistantPage";
+import AdminPage from "./pages/AdminPage";
 import api, { setToken } from "./api";
-import type { Challenge, DashboardPayload, LeaderboardItem } from "./types";
+import type { Challenge, DashboardPayload, LeaderboardItem, AnalyticsPayload } from "./types";
 
-type AnalyticsPayload = {
-  weeklyGrowth: { week: string; xp: number }[];
-  metrics: { accuracy: number; speed: number; consistency: number };
-  proficiency: { tech: number; aptitude: number; softSkills: number };
-  feedback: string;
-};
+// Decode JWT to extract role
+function decodeJwt(token: string): { sub: string; email: string; role: string } | null {
+  try {
+    const payload = token.split(".")[1];
+    return JSON.parse(atob(payload));
+  } catch {
+    return null;
+  }
+}
 
 export default function App() {
   const [token, setAuthToken] = useState<string | null>(localStorage.getItem("token"));
@@ -26,6 +30,9 @@ export default function App() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardItem[]>([]);
   const [analytics, setAnalytics] = useState<AnalyticsPayload | null>(null);
 
+  const decoded = token ? decodeJwt(token) : null;
+  const userRole = decoded?.role || "user";
+
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
     document.documentElement.classList.toggle("light", !dark);
@@ -34,7 +41,11 @@ export default function App() {
   useEffect(() => {
     setToken(token);
     if (!token) return;
-    const run = async () => {
+    fetchAll();
+  }, [token]);
+
+  const fetchAll = async () => {
+    try {
       const [dash, list, lb, an] = await Promise.all([
         api.get("/api/dashboard"),
         api.get("/api/challenges"),
@@ -45,9 +56,10 @@ export default function App() {
       setChallenges(list.data.items);
       setLeaderboard(lb.data.items);
       setAnalytics(an.data);
-    };
-    run();
-  }, [token]);
+    } catch (err) {
+      console.error("Failed to fetch data:", err);
+    }
+  };
 
   const handleAuth = (newToken: string) => {
     localStorage.setItem("token", newToken);
@@ -64,31 +76,33 @@ export default function App() {
   };
 
   const refreshData = async () => {
-    const [dash, list, lb, an] = await Promise.all([
-      api.get("/api/dashboard"),
-      api.get("/api/challenges"),
-      api.get("/api/leaderboard"),
-      api.get("/api/analytics")
-    ]);
-    setDashboard(dash.data);
-    setChallenges(list.data.items);
-    setLeaderboard(lb.data.items);
-    setAnalytics(an.data);
+    await fetchAll();
   };
 
   return (
     <Routes>
-      <Route element={<AppLayout dark={dark} onToggleTheme={() => setDark((v) => !v)} isAuthed={Boolean(token)} onLogout={handleLogout} />}>
+      <Route
+        element={
+          <AppLayout
+            dark={dark}
+            onToggleTheme={() => setDark((v) => !v)}
+            isAuthed={Boolean(token)}
+            onLogout={handleLogout}
+            userRole={userRole}
+            streak={dashboard?.user.streak}
+          />
+        }
+      >
         <Route path="/" element={token ? <Navigate to="/dashboard" replace /> : <LandingPage onAuth={handleAuth} />} />
         <Route path="/dashboard" element={token ? <DashboardPage data={dashboard} /> : <Navigate to="/" replace />} />
         <Route path="/challenges" element={token ? <ChallengesPage challenges={challenges} onRefresh={refreshData} /> : <Navigate to="/" replace />} />
         <Route path="/leaderboard" element={token ? <LeaderboardPage items={leaderboard} /> : <Navigate to="/" replace />} />
-        <Route path="/profile" element={token ? <ProfilePage data={dashboard} /> : <Navigate to="/" replace />} />
+        <Route path="/profile" element={token ? <ProfilePage /> : <Navigate to="/" replace />} />
         <Route path="/analytics" element={token ? <AnalyticsPage data={analytics} /> : <Navigate to="/" replace />} />
         <Route path="/assistant" element={token ? <AssistantPage /> : <Navigate to="/" replace />} />
+        <Route path="/admin" element={token ? <AdminPage /> : <Navigate to="/" replace />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>
   );
 }
-
