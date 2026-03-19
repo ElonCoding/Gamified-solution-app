@@ -1,103 +1,94 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "./contexts/AuthContext";
-import { SocketProvider } from "./contexts/SocketContext";
-import ProtectedRoute from "./components/ProtectedRoute";
-import EducatorRoute from "./components/EducatorRoute";
+import { useEffect, useState } from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
+import AppLayout from "./components/AppLayout";
+import LandingPage from "./pages/LandingPage";
+import DashboardPage from "./pages/DashboardPage";
+import ChallengesPage from "./pages/ChallengesPage";
+import LeaderboardPage from "./pages/LeaderboardPage";
+import ProfilePage from "./pages/ProfilePage";
+import AnalyticsPage from "./pages/AnalyticsPage";
+import AssistantPage from "./pages/AssistantPage";
+import api, { setToken } from "./api";
+import type { Challenge, DashboardPayload, LeaderboardItem } from "./types";
 
-// Student Pages
-import StudentDashboard from "./pages/user/StudentDashboard";
-import SecureTestEnvironment from "./pages/user/SecureTestEnvironment";
-import RewardGenerationPage from "./pages/user/RewardGenerationPage";
-import TrophyRoom from "./pages/user/TrophyRoom";
-import ARPlayground from "./pages/user/ARPlayground";
+type AnalyticsPayload = {
+  weeklyGrowth: { week: string; xp: number }[];
+  metrics: { accuracy: number; speed: number; consistency: number };
+  proficiency: { tech: number; aptitude: number; softSkills: number };
+  feedback: string;
+};
 
-// Educator Pages
-import EducatorLoginPage from "./pages/educator/EducatorLoginPage";
-import EducatorDashboard from "./pages/educator/EducatorDashboard";
-import MonitoringQueuePage from "./pages/educator/MonitoringQueuePage";
-import EducatorChatPage from "./pages/educator/EducatorChatPage";
+export default function App() {
+  const [token, setAuthToken] = useState<string | null>(localStorage.getItem("token"));
+  const [dark, setDark] = useState(true);
+  const [dashboard, setDashboard] = useState<DashboardPayload | null>(null);
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardItem[]>([]);
+  const [analytics, setAnalytics] = useState<AnalyticsPayload | null>(null);
 
-// Shared Components
-import TeacherChatWidget from "./components/TeacherChatWidget";
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", dark);
+    document.documentElement.classList.toggle("light", !dark);
+  }, [dark]);
 
-function App() {
-    return (
-        <AuthProvider>
-            <SocketProvider>
-                <Router>
-                    <div className='min-h-screen bg-edu-dark'>
-                        <Routes>
-                            {/* Student Routes */}
-                            <Route path='/' element={<StudentDashboard />} />
-                            <Route
-                                path='/scanner'
-                                element={
-                                    <ProtectedRoute>
-                                        <SecureTestEnvironment />
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path='/scan-result'
-                                element={
-                                    <ProtectedRoute>
-                                        <RewardGenerationPage />
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path='/submissions'
-                                element={
-                                    <ProtectedRoute>
-                                        <TrophyRoom />
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path='/submissions/:id'
-                                element={
-                                    <ProtectedRoute>
-                                        <ARPlayground />
-                                    </ProtectedRoute>
-                                }
-                            />
+  useEffect(() => {
+    setToken(token);
+    if (!token) return;
+    const run = async () => {
+      const [dash, list, lb, an] = await Promise.all([
+        api.get("/api/dashboard"),
+        api.get("/api/challenges"),
+        api.get("/api/leaderboard"),
+        api.get("/api/analytics")
+      ]);
+      setDashboard(dash.data);
+      setChallenges(list.data.items);
+      setLeaderboard(lb.data.items);
+      setAnalytics(an.data);
+    };
+    run();
+  }, [token]);
 
-                            {/* Educator Routes */}
-                            <Route path='/educator/login' element={<EducatorLoginPage />} />
-                            <Route
-                                path='/educator/dashboard'
-                                element={
-                                    <EducatorRoute>
-                                        <EducatorDashboard />
-                                    </EducatorRoute>
-                                }
-                            />
-                            <Route
-                                path='/educator/queue'
-                                element={
-                                    <EducatorRoute>
-                                        <MonitoringQueuePage />
-                                    </EducatorRoute>
-                                }
-                            />
-                            <Route
-                                path='/educator/comms'
-                                element={
-                                    <EducatorRoute>
-                                        <EducatorChatPage />
-                                    </EducatorRoute>
-                                }
-                            />
+  const handleAuth = (newToken: string) => {
+    localStorage.setItem("token", newToken);
+    setAuthToken(newToken);
+  };
 
-                            {/* Fallback */}
-                            <Route path='*' element={<Navigate to='/' replace />} />
-                        </Routes>
-                        <TeacherChatWidget />
-                    </div>
-                </Router>
-            </SocketProvider>
-        </AuthProvider>
-    );
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setAuthToken(null);
+    setDashboard(null);
+    setChallenges([]);
+    setLeaderboard([]);
+    setAnalytics(null);
+  };
+
+  const refreshData = async () => {
+    const [dash, list, lb, an] = await Promise.all([
+      api.get("/api/dashboard"),
+      api.get("/api/challenges"),
+      api.get("/api/leaderboard"),
+      api.get("/api/analytics")
+    ]);
+    setDashboard(dash.data);
+    setChallenges(list.data.items);
+    setLeaderboard(lb.data.items);
+    setAnalytics(an.data);
+  };
+
+  return (
+    <Routes>
+      <Route element={<AppLayout dark={dark} onToggleTheme={() => setDark((v) => !v)} isAuthed={Boolean(token)} onLogout={handleLogout} />}>
+        <Route path="/" element={token ? <Navigate to="/dashboard" replace /> : <LandingPage onAuth={handleAuth} />} />
+        <Route path="/dashboard" element={token ? <DashboardPage data={dashboard} /> : <Navigate to="/" replace />} />
+        <Route path="/challenges" element={token ? <ChallengesPage challenges={challenges} onRefresh={refreshData} /> : <Navigate to="/" replace />} />
+        <Route path="/leaderboard" element={token ? <LeaderboardPage items={leaderboard} /> : <Navigate to="/" replace />} />
+        <Route path="/profile" element={token ? <ProfilePage data={dashboard} /> : <Navigate to="/" replace />} />
+        <Route path="/analytics" element={token ? <AnalyticsPage data={analytics} /> : <Navigate to="/" replace />} />
+        <Route path="/assistant" element={token ? <AssistantPage /> : <Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Route>
+    </Routes>
+  );
 }
 
-export default App;
